@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>AI Dungeon Master</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+<div id="app">
+
+
+    <!-- =====================================================
+         CHARACTER CREATION
+         ===================================================== -->
+
+    <section
+        id="character-screen"
+        class="screen"
+    >
+
+        <div class="creation-card">
+
+            <h1>⚔ AI Dungeon Master</h1>
+
+            <p class="subtitle">
+                Create your adventurer
+            </p>
+
+
+            <!-- Character Name -->
+
+            <label>
+                Character Name
+            </label>
+
+            <input
+                id="character-name"
+                type="text"
+                placeholder="e.g. Jishnu"
+                autocomplete="off"
+            >
+
+
+            <!-- Class Selection -->
+
+            <h3>Choose Your Class</h3>
+
+            <div class="class-buttons">
+
+                <button
+                    type="button"
+                    onclick="selectClass('Warrior')"
+                >
+                    <span>⚔</span>
+
+                    <strong>
+                        Warrior
+                    </strong>
+
+                    <small>
+                        Strong melee fighter
+                    </small>
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="selectClass('Rogue')"
+                >
+                    <span>🗡</span>
+
+                    <strong>
+                        Rogue
+                    </strong>
+
+                    <small>
+                        Fast and agile
+                    </small>
+                </button>
+
+
+                <button
+                    type="button"
+                    onclick="selectClass('Mage')"
+                >
+                    <span>✨</span>
+
+                    <strong>
+                        Mage
+                    </strong>
+
+                    <small>
+                        Master of magic
+                    </small>
+                </button>
+
+            </div>
+
+
+            <!-- Selected Class -->
+
+            <div
+                id="class-info"
+                class="class-info"
+            >
+            </div>
+
+
+            <!-- Backstory -->
+
+            <label>
+                Backstory
+            </label>
+
+            <textarea
+                id="backstory"
+                placeholder="Tell the Dungeon Master a little about your character..."
+            ></textarea>
+
+
+            <!-- Custom Stats -->
+
+            <div class="custom-section">
+
+                <h3>
+                    Custom Attributes
+                </h3>
+
+                <p>
+                    Your three attributes must total exactly 30.
+                </p>
+
+
+                <div class="custom-stats">
+
+                    <label>
+
+                        STR
+
+                        <input
+                            id="strength"
+                            type="number"
+                            value="10"
+                            min="1"
+                            max="20"
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        DEX
+
+                        <input
+                            id="dexterity"
+                            type="number"
+                            value="10"
+                            min="1"
+                            max="20"
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        INT
+
+                        <input
+                            id="intelligence"
+                            type="number"
+                            value="10"
+                            min="1"
+                            max="20"
+                        >
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- Error -->
+
+            <p
+                id="creation-error"
+                class="error"
+            ></p>
+
+
+            <!-- Begin -->
+
+            <button
+                type="button"
+                class="primary"
+                onclick="createCharacter()"
+            >
+                Begin Adventure
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         STARTING LOCATION
+         ===================================================== -->
+
+    <section
+        id="location-screen"
+        class="screen hidden"
+    >
+
+        <div class="creation-card">
+
+            <h1>
+                Choose Your Destiny
+            </h1>
+
+            <p class="subtitle">
+                Where does your adventure begin?
+            </p>
+
+
+            <!-- Village -->
+
+            <button
+                type="button"
+                class="location-button"
+                onclick="startGame('Blackwood Village')"
+            >
+
+                <span class="location-icon">
+                    🏘
+                </span>
+
+                <span>
+
+                    <strong>
+                        Blackwood Village
+                    </strong>
+
+                    <small>
+                        A village hiding a dark mystery.
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <!-- Forest -->
+
+            <button
+                type="button"
+                class="location-button"
+                onclick="startGame('Blackwood Forest')"
+            >
+
+                <span class="location-icon">
+                    🌲
+                </span>
+
+                <span>
+
+                    <strong>
+                        Blackwood Forest
+                    </strong>
+
+                    <small>
+                        A dangerous forest filled with strange lights.
+                    </small>
+
+                </span>
+
+            </button>
+
+
+            <!-- Ruins -->
+
+            <button
+                type="button"
+                class="location-button"
+                onclick="startGame('Forgotten Ruins')"
+            >
+
+                <span class="location-icon">
+                    🏛
+                </span>
+
+                <span>
+
+                    <strong>
+                        Forgotten Ruins
+                    </strong>
+
+                    <small>
+                        Ancient ruins where something may still be alive.
+                    </small>
+
+                </span>
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         MAIN GAME
+         ===================================================== -->
+
+    <section
+        id="game-screen"
+        class="game hidden"
+    >
+
+
+        <!-- =================================================
+             LEFT SIDEBAR
+             ================================================= -->
+
+        <aside class="sidebar">
+
+
+            <!-- =============================================
+                 CHARACTER PANEL
+                 ============================================= -->
+
+            <div class="character-panel">
+
+                <div class="character-heading">
+
+                    <div class="character-avatar">
+                        ⚔
+                    </div>
+
+                    <div>
+
+                        <h2 id="player-name">
+                            Adventurer
+                        </h2>
+
+                        <div id="player-class">
+                            Level 1
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- HP -->
+
+                <div class="meter-label">
+
+                    <span>
+                        ❤️ HP
+                    </span>
+
+                    <span id="hp-text">
+                        0 / 0
+                    </span>
+
+                </div>
+
+                <div class="meter">
+
+                    <div
+                        id="hp-bar"
+                        class="meter-fill hp"
+                    ></div>
+
+                </div>
+
+
+                <!-- XP -->
+
+                <div class="meter-label">
+
+                    <span>
+                        ✨ XP
+                    </span>
+
+                    <span id="xp-text">
+                        0 XP
+                    </span>
+
+                </div>
+
+                <div class="meter">
+
+                    <div
+                        id="xp-bar"
+                        class="meter-fill xp"
+                    ></div>
+
+                </div>
+
+
+                <!-- Attributes -->
+
+                <h3>
+                    Attributes
+                </h3>
+
+
+                <!-- Strength -->
+
+                <div class="stat">
+
+                    <span>
+                        STR
+                    </span>
+
+                    <div class="small-meter">
+
+                        <div
+                            id="str-bar"
+                            class="meter-fill strength"
+                        ></div>
+
+                    </div>
+
+                    <b id="str-value">
+                        0
+                    </b>
+
+                </div>
+
+
+                <!-- Dexterity -->
+
+                <div class="stat">
+
+                    <span>
+                        DEX
+                    </span>
+
+                    <div class="small-meter">
+
+                        <div
+                            id="dex-bar"
+                            class="meter-fill dexterity"
+                        ></div>
+
+                    </div>
+
+                    <b id="dex-value">
+                        0
+                    </b>
+
+                </div>
+
+
+                <!-- Intelligence -->
+
+                <div class="stat">
+
+                    <span>
+                        INT
+                    </span>
+
+                    <div class="small-meter">
+
+                        <div
+                            id="int-bar"
+                            class="meter-fill intelligence"
+                        ></div>
+
+                    </div>
+
+                    <b id="int-value">
+                        0
+                    </b>
+
+                </div>
+
+
+                <!-- Gold -->
+
+                <div class="gold">
+
+                    🪙
+
+                    <span id="gold">
+                        0
+                    </span>
+
+                    Gold
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 INVENTORY
+                 ============================================= -->
+
+            <div class="inventory-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        🎒 Inventory
+                    </h2>
+
+                    <span id="inventory-count">
+                        0
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="inventory-list"
+                    class="inventory-list"
+                >
+
+                    <div class="inventory-item">
+
+                        <small>
+                            Inventory is empty.
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =============================================
+                 NPC PANEL
+                 ============================================= -->
+
+            <div class="npc-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        👥 Nearby
+                    </h2>
+
+                </div>
+
+
+                <div
+                    id="npc-list"
+                    class="npc-list"
+                >
+
+                    <small>
+                        No one nearby.
+                    </small>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+
+        <!-- =================================================
+             MAIN CONTENT
+             ================================================= -->
+
+        <main class="main">
+
+
+            <!-- =============================================
+                 SCENE HEADER
+                 ============================================= -->
+
+            <header class="scene-header">
+
+                <div>
+
+                    <div class="scene-location-label">
+                        CURRENT LOCATION
+                    </div>
+
+                    <h1 id="scene-name">
+                        Blackwood Village
+                    </h1>
+
+                    <p id="scene-description">
+                    </p>
+
+                </div>
+
+            </header>
+
+
+
+            <!-- =============================================
+                 CHAT
+                 ============================================= -->
+
+            <div
+                id="chat"
+                class="chat"
+            >
+
+                <!-- Messages are inserted by app.js -->
+
+            </div>
+
+
+
+            <!-- =============================================
+                 PLAYER INPUT
+                 ============================================= -->
+
+            <form
+                id="action-form"
+                class="action-box"
+            >
+
+                <input
+                    id="action-input"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="What do you do?"
+                >
+
+                <button
+                    type="submit"
+                >
+                    Send
+                </button>
+
+            </form>
+
+        </main>
+
+    </section>
+
+</div>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script
+    src="{{ url_for('static', filename='app.js') }}"
+></script>
+
+
+</body>
+
+</html>
